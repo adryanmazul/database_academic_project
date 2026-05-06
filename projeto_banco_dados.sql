@@ -54,3 +54,12 @@ CREATE TABLE itens_pedidos (
 
     CONSTRAINT uq_item UNIQUE (pedido_id, produto_id)
 )
+
+CREATE TABLE pagamentos (
+    id_pagamento SERIAL PRIMARY KEY,
+    pedido_id INTEGER NOT NULL REFERENCES pedidos (id_pedido) ON DELETE RESTRICT,
+    metodo VARCHAR(100) NOT NULL CHECK (metodo IN ('cartao_credito', 'cartao_debito', 'pix', 'boleto')),
+    status VARCHAR(100) NOT NULL DEFAULT 'pendente' CHECK (status IN ('pendente', 'aprovado', 'recusado', 'estornado')),
+    valor NUMERIC(10, 2) NOT NULL CHECK (valor > 0),
+    pago_em TIMESTAMP
+)
