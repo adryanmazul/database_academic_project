@@ -33,3 +33,24 @@ CREATE TABLE produtos (
     ativo BOOLEAN DEFAULT TRUE,
     criado_em TIMESTAMP DEFAULT NOW()
 )
+
+CREATE TABLE pedidos (
+    id_pedido SERIAL PRIMARY KEY,
+    cliente_id INTEGER NOT NULL REFERENCES clientes (id_cliente),
+    endereco_id INTEGER REFERENCES enderecos (id_endereco),
+    status VARCHAR(100) NOT NULL DEFAULT 'pendente' CHECK (status IN('pendente',
+    'confirmado', 'enviado', 'entregue', 'cancelado')),
+    total DECIMAL NOT NULL DEFAULT 0 CHECK (total >= 0),
+    criado_em TIMESTAMP DEFAULT NOW(),
+    atualizado_em TIMESTAMP DEFAULT NOW()
+)
+
+CREATE TABLE itens_pedidos (
+    id_itens_pedidos SERIAL PRIMARY KEY,
+    pedido_id INTEGER NOT NULL REFERENCES pedidos (id_pedido) ON DELETE CASCADE,
+    produto_id INTEGER NOT NULL REFERENCES produtos (id_produto) ON DELETE RESTRICT,
+    quantidade INTEGER NOT NULL CHECK (quantidade >= 1),
+    preco_unitario NUMERIC(10, 2) NOT NULL CHECK (preco_unitario > 0),
+
+    CONSTRAINT uq_item UNIQUE (pedido_id, produto_id)
+)
